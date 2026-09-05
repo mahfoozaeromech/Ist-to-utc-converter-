@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220"><link rel="manifest" href="manifest.json">
+<title>IST ↔ UTC • Aviation</title>
+<style>.periods{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}.periods div{background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:9px 2px;text-align:center}.periods b{display:block}.periods span{font-size:11px;color:var(--muted)}.melcat{margin-top:0}.melcat.active{outline:2px solid var(--accent)}
+
+:root{--bg:#eef1f5;--card:#fff;--text:#111827;--muted:#64748b;--border:#d7dce3;--accent:#111827;--soft:#f3f4f6}
+body.dark{--bg:#0b1220;--card:#121a2a;--text:#f8fafc;--muted:#a8b1c1;--border:#2a3548;--accent:#f8fafc;--soft:#1b2536}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:560px;margin:auto;padding:18px 16px 34px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}h1{font-size:24px;margin:0}.sub{color:var(--muted);font-size:13px;margin:3px 0 0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;box-shadow:0 5px 20px #0001;margin-bottom:14px}.clock{display:grid;grid-template-columns:1fr 1fr;gap:10px}.clockbox{background:var(--soft);border-radius:15px;padding:12px}.clockbox b{display:block;font-size:12px;color:var(--muted)}.clockbox span{font-size:21px;font-weight:800}
+label{display:block;font-size:13px;font-weight:800;margin:14px 0 7px}select,button{width:100%;min-height:52px;border-radius:13px;font-size:17px}select{border:1px solid var(--border);background:var(--card);color:var(--text);padding:0 13px}button{border:0;background:var(--accent);color:var(--card);font-weight:800;padding:0 14px;margin-top:10px}.secondary{background:var(--soft);color:var(--text);border:1px solid var(--border)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.result{margin-top:16px;background:var(--soft);border-radius:15px;padding:16px;font-size:18px;font-weight:800;line-height:1.7;white-space:pre-line}.tiny{font-size:12px;color:var(--muted);text-align:center;margin-top:12px}
+.fieldbtn{display:flex;align-items:center;justify-content:space-between;text-align:left;background:var(--card);color:var(--text);border:1px solid var(--border);margin-top:0}.fieldbtn .arrow{font-size:20px;color:var(--muted)}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;padding:18px;align-items:flex-end;justify-content:center}.modal.show{display:flex}.sheet{width:min(560px,100%);background:var(--card);color:var(--text);border-radius:22px 22px 12px 12px;padding:18px;box-shadow:0 10px 40px #0008}.sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.sheethead b{font-size:18px}.x{width:auto;min-height:42px;margin:0;padding:0 14px}
+.calnav{display:grid;grid-template-columns:52px 1fr 52px;gap:8px;align-items:center}.calnav button{margin:0}.monthtitle{text-align:center;font-weight:800}.week,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:8px}.week div{text-align:center;font-size:12px;color:var(--muted);font-weight:700;padding:5px}.day{min-height:42px;margin:0;padding:0;background:var(--soft);color:var(--text);border:1px solid var(--border);font-size:15px}.day.muted{opacity:.35}.day.selected{background:var(--accent);color:var(--card)}
+.timegrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.timegrid label{margin:0 0 6px}.timegrid select{min-height:56px;font-size:20px;text-align:center}.done{margin-top:14px}
+@media(max-width:380px){main{padding-left:11px;padding-right:11px}.card{padding:14px}.day{min-height:38px}}
+.melcats{row-gap:12px;column-gap:12px;}\n</style>
+</head>
+<body><main>
+<div class="top"><div><h1>✈️ IST ↔ UTC</h1><div class="sub">Aviation Time Converter • Zulu Time</div></div><button id="dark" class="secondary" style="width:auto;min-height:44px;margin:0">☾</button></div>
+<div class="card"><div class="clock"><div class="clockbox"><b>INDIA • IST</b><span id="istNow">--:--:--</span></div><div class="clockbox"><b>UTC • ZULU</b><span id="utcNow">--:--:--Z</span></div></div></div>
+<div class="card">
+<label for="direction">Conversion</label><select id="direction"><option>IST → UTC / Z</option><option>UTC / Z → IST</option></select>
+<label>Date</label><button id="dateBtn" class="fieldbtn" type="button"><span id="dateText">Select date</span><span class="arrow">▾</span></button>
+<label>Time (24-hour)</label><button id="timeBtn" class="fieldbtn" type="button"><span id="timeText">Select time</span><span class="arrow">▾</span></button>
+<button onclick="convert()">CONVERT</button>
+<div class="row"><button class="secondary" onclick="currentTime()">Current Time</button><button class="secondary" onclick="swap()">↔ Swap</button></div>
+<div id="result" class="result">Select a date and time</div>
+<div class="row"><button class="secondary" onclick="copyResult()">Copy Result</button><button class="secondary" onclick="clearAll()">Clear</button></div>
+<div class="tiny">IST = UTC + 05:30 • Date rollover handled automatically</div>
+</div><div class="card" id="melCard"><h2 style="margin:0 0 6px">✈️ MEL DUE DATE</h2><div class="tiny" style="text-align:left;margin:0 0 12px">Calculation aid only — always verify the applicable period against the current approved MEL.</div><div class="periods"><div><b>A</b><span>01 day</span></div><div><b>B</b><span>03 days</span></div><div><b>C</b><span>10 days</span></div><div><b>D</b><span>120 days</span></div></div><label>Category</label><div class="row"><button class="secondary melcat active" data-cat="A">A • 1 day</button><button class="secondary melcat" data-cat="B">B • 3 days</button></div><div class="row"><button class="secondary melcat" data-cat="C">C • 10 days</button><button class="secondary melcat" data-cat="D">D • 120 days</button></div><label>MEL Entry Date (UTC / Z)</label><button id="melDateBtn" class="fieldbtn" type="button"><span id="melDateText">--</span><span class="arrow">▾</span></button><label>MEL Entry Time (UTC / Z)</label><button id="melTimeBtn" class="fieldbtn" type="button"><span id="melTimeText">--:--:--Z</span><span class="arrow">▾</span></button><div id="melResult" class="result"></div><div class="tiny"></div></div></main>
+
+<div id="dateModal" class="modal"><div class="sheet"><div class="sheethead"><b>Select date</b><button class="secondary x" onclick="closeModal('dateModal')">Done</button></div><div class="calnav"><button class="secondary" onclick="changeMonth(-1)">‹</button><div id="monthTitle" class="monthtitle"></div><button class="secondary" onclick="changeMonth(1)">›</button></div><div class="week"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="days" class="days"></div></div></div>
+<div id="melDateModal" class="modal"><div class="sheet"><div class="sheethead"><b>Select MEL entry date (UTC)</b><button class="secondary x" onclick="closeModal('melDateModal')">Done</button></div><div class="calnav"><button class="secondary" onclick="melChangeMonth(-1)">‹</button><div id="melMonthTitle" class="monthtitle"></div><button class="secondary" onclick="melChangeMonth(1)">›</button></div><div class="week"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="melDays" class="days"></div></div></div><div id="melTimeModal" class="modal"><div class="sheet"><div class="sheethead"><b>Select MEL entry time (UTC)</b><button class="secondary x" onclick="saveMelTime();closeModal('melTimeModal')">Done</button></div><div class="timegrid"><div><label>Hour</label><select id="melHour"></select></div><div><label>Minute</label><select id="melMinute"></select></div><div><label>Second</label><select id="melSecond"></select></div></div><button class="done" onclick="saveMelTime();closeModal('melTimeModal')">SET TIME</button></div></div><div id="timeModal" class="modal"><div class="sheet"><div class="sheethead"><b>Select time</b><button class="secondary x" onclick="saveTime();closeModal('timeModal')">Done</button></div><div class="timegrid"><div><label>Hour</label><select id="hour"></select></div><div><label>Minute</label><select id="minute"></select></div><div><label>Second</label><select id="second"></select></div></div><button class="done" onclick="saveTime();closeModal('timeModal')">SET TIME</button></div></div>
+<script>
+const $=id=>document.getElementById(id),off=330*60000,pad=n=>String(n).padStart(2,'0');
+let selectedDate='',selectedTime='';let viewYear,viewMonth;
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function fmtDate(s){if(!s)return 'Select date';let [y,m,d]=s.split('-');return `${d}-${m}-${y}`}
+function openDate(){let base=selectedDate?new Date(selectedDate+'T00:00:00'):new Date();viewYear=base.getFullYear();viewMonth=base.getMonth();renderCalendar();$('dateModal').classList.add('show')}
+function renderCalendar(){ $('monthTitle').textContent=`${months[viewMonth]} ${viewYear}`;let first=new Date(viewYear,viewMonth,1).getDay(),days=new Date(viewYear,viewMonth+1,0).getDate(),prev=new Date(viewYear,viewMonth,0).getDate();let html='';for(let i=0;i<42;i++){let n=i-first+1,y=viewYear,m=viewMonth,cls='day';if(n<1){n=prev+n;m--;cls+=' muted'}else if(n>days){n-=days;m++;cls+=' muted'}let yy=viewYear;if(m<0){m=11;yy--}if(m>11){m=0;yy++}let ds=`${yy}-${pad(m+1)}-${pad(n)}`;if(ds===selectedDate)cls+=' selected';html+=`<button type="button" class="${cls}" onclick="pickDate('${ds}')">${n}</button>`}$('days').innerHTML=html}
+function changeMonth(n){viewMonth+=n;if(viewMonth<0){viewMonth=11;viewYear--}if(viewMonth>11){viewMonth=0;viewYear++}renderCalendar()}
+function pickDate(s){selectedDate=s;$('dateText').textContent=fmtDate(s);renderCalendar();closeModal('dateModal')}
+function openTime(){let [h,m,s]=(selectedTime||'00:00:00').split(':').map(Number);$('hour').value=pad(h);$('minute').value=pad(m);$('second').value=pad(s);$('timeModal').classList.add('show')}
+function fillTimes(){for(let i=0;i<24;i++)$('hour').insertAdjacentHTML('beforeend',`<option value="${pad(i)}">${pad(i)}</option>`);for(let i=0;i<60;i++){let v=pad(i);$('minute').insertAdjacentHTML('beforeend',`<option value="${v}">${v}</option>`);$('second').insertAdjacentHTML('beforeend',`<option value="${v}">${v}</option>`)}}
+function saveTime(){selectedTime=`${$('hour').value}:${$('minute').value}:${$('second').value}`;$('timeText').textContent=selectedTime}
+function closeModal(id){$(id).classList.remove('show')}
+function makeUTC(){let [y,m,d]=selectedDate.split('-').map(Number),[h,mi,se]=selectedTime.split(':').map(Number);return new Date(Date.UTC(y,m-1,d,h,mi,se||0))}
+function fmt(d,z=false){return `${pad(d.getUTCDate())}-${pad(d.getUTCMonth()+1)}-${d.getUTCFullYear()} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}${z?'Z':''}`}
+function setFields(d){let ds=`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`,ts=`${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;selectedDate=ds;selectedTime=ts;$('dateText').textContent=fmtDate(ds);$('timeText').textContent=ts}
+function convert(){if(!selectedDate||!selectedTime){$('result').textContent='❌ Select both date and time.';return}let entered=makeUTC(),out=$('direction').selectedIndex===0?new Date(entered-off):new Date(entered.getTime()+off);if($('direction').selectedIndex===0)$('result').textContent=`IST: ${fmt(entered)}\n\nUTC / Z: ${fmt(out,true)}`;else $('result').textContent=`UTC / Z: ${fmt(entered,true)}\n\nIST: ${fmt(out)}`}
+function currentTime(){let n=new Date();if($('direction').selectedIndex===0){setFields(new Date(n.getTime()+off))}else{setFields(n)}convert()}
+function swap(){let old=$('direction').selectedIndex;$('direction').selectedIndex=old?0:1;if(selectedDate&&selectedTime)convert()}
+function clearAll(){selectedDate='';selectedTime='';$('dateText').textContent='Select date';$('timeText').textContent='Select time';$('result').textContent='Select a date and time'}
+function copyResult(){if(navigator.clipboard)navigator.clipboard.writeText($('result').textContent)}
+function clocks(){let n=new Date(),ist=new Date(n.getTime()+off);$('istNow').textContent=`${pad(ist.getUTCHours())}:${pad(ist.getUTCMinutes())}:${pad(ist.getUTCSeconds())}`;$('utcNow').textContent=`${pad(n.getUTCHours())}:${pad(n.getUTCMinutes())}:${pad(n.getUTCSeconds())}Z`}
+let melCat='A',melDate='',melTime='',melViewYear,melViewMonth;const melPeriods={A:1,B:3,C:10,D:120};function melPad(n){return String(n).padStart(2,'0')}function melFmtDate(s){let [y,m,d]=s.split('-');return `${d}-${m}-${y}`}function melSetNow(){let n=new Date();melDate=`${n.getUTCFullYear()}-${melPad(n.getUTCMonth()+1)}-${melPad(n.getUTCDate())}`;melTime=`${melPad(n.getUTCHours())}:${melPad(n.getUTCMinutes())}:${melPad(n.getUTCSeconds())}`;$('melDateText').textContent=melFmtDate(melDate);$('melTimeText').textContent=melTime+'Z';melCalculate()}function melCalculate(){if(!melDate)return;let [y,m,d]=melDate.split('-').map(Number);/* Calendar-date calculation: entry date is excluded; entry time and current time are ignored. */let due=new Date(Date.UTC(y,m-1,d+melPeriods[melCat],0,0,0));let now=new Date();let todayMidnight=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),0,0,0));let diffDays=Math.round((due.getTime()-todayMidnight.getTime())/86400000);let status=diffDays<=0?'EXPIRED':`VALID • ${diffDays} ${diffDays===1?'day':'days'} remaining`;$('melResult').textContent=`Category ${melCat} • ${melPeriods[melCat]} ${melPeriods[melCat]===1?'day':'days'}
+Entry date: ${melFmtDate(melDate)}
+Due: ${melFmtDate(`${due.getUTCFullYear()}-${melPad(due.getUTCMonth()+1)}-${melPad(due.getUTCDate())}`)}
+${status}`}function melOpenDate(){let [y,m,d]=melDate.split('-').map(Number);melViewYear=y;melViewMonth=m-1;melRenderCalendar();$('melDateModal').classList.add('show')}function melRenderCalendar(){let first=new Date(melViewYear,melViewMonth,1).getDay(),days=new Date(melViewYear,melViewMonth+1,0).getDate(),html='';for(let i=0;i<42;i++){let n=i-first+1,yy=melViewYear,mm=melViewMonth;if(n<1){n+=new Date(yy,mm,0).getDate();mm--}else if(n>days){n-=days;mm++}if(mm<0){mm=11;yy--}if(mm>11){mm=0;yy++}let ds=`${yy}-${melPad(mm+1)}-${melPad(n)}`,cl='day'+(ds===melDate?' selected':'');html+=`<button type="button" class="${cl}" onclick="melPickDate('${ds}')">${n}</button>`}$('melMonthTitle').textContent=months[melViewMonth]+' '+melViewYear;$('melDays').innerHTML=html}function melChangeMonth(n){melViewMonth+=n;if(melViewMonth<0){melViewMonth=11;melViewYear--}if(melViewMonth>11){melViewMonth=0;melViewYear++}melRenderCalendar()}function melPickDate(s){melDate=s;$('melDateText').textContent=melFmtDate(s);melCalculate();closeModal('melDateModal')}function melOpenTime(){let [h,m,ss]=melTime.split(':').map(Number);$('melHour').value=melPad(h);$('melMinute').value=melPad(m);$('melSecond').value=melPad(ss);$('melTimeModal').classList.add('show')}function melFill(){for(let i=0;i<24;i++)$('melHour').insertAdjacentHTML('beforeend',`<option value="${melPad(i)}">${melPad(i)}</option>`);for(let i=0;i<60;i++){let v=melPad(i);$('melMinute').insertAdjacentHTML('beforeend',`<option value="${v}">${v}</option>`);$('melSecond').insertAdjacentHTML('beforeend',`<option value="${v}">${v}</option>`)}}function saveMelTime(){melTime=`${$('melHour').value}:${$('melMinute').value}:${$('melSecond').value}`;$('melTimeText').textContent=melTime+'Z';melCalculate()}document.querySelectorAll('.melcat').forEach(b=>b.onclick=()=>{melCat=b.dataset.cat;document.querySelectorAll('.melcat').forEach(x=>x.classList.remove('active'));b.classList.add('active');melCalculate()});$('melDateBtn').onclick=melOpenDate;$('melTimeBtn').onclick=melOpenTime;melSetNow();setInterval(()=>{if(!melManual)melSetNow();else melCalculate()},1000);$('melDateBtn').addEventListener('click',()=>melManual=true);$('melTimeBtn').addEventListener('click',()=>melManual=true);$('dateBtn').onclick=openDate;$('timeBtn').onclick=openTime;fillTimes();setInterval(clocks,1000);clocks();
+$('dark').onclick=()=>{document.body.classList.toggle('dark');localStorage.dark=document.body.classList.contains('dark')?'1':'0'};if(localStorage.dark==='1')document.body.classList.add('dark');
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+</script><script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('./sw.js', {updateViaCache:'none'});
+      await reg.update();
+      if (reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        // Do not loop; the next navigation uses the new worker.
+      });
+    } catch(e) {
+      console.log('Offline cache registration unavailable', e);
+    }
+  });
+})();
+</script>
+
+<div style="text-align:center;font-size:.7rem;opacity:.45;margin:12px 0">Aviation Utility • v10</div>
+</body></html>
